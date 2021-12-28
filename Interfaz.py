@@ -18,7 +18,78 @@ IN2 = 8 # A2
 IN3 = 2 # B1
 IN4 = 4 # B2
 paso = 1.8
-# arduino = Arduino("COM3") # Puerto del Arduino 
+diametro_polea = 25.4 # en mm
+no_pi = 3.1415
+perimetro = no_pi*diametro_polea
+i_grade = 0
+
+conteo_1_ccw_x = 0
+conteo_2_ccw_x = 0
+conteo_3_ccw_x = 0
+conteo_4_ccw_x = 0
+i_ccw_x = 0
+conteo_1_ccw_y = 0
+conteo_2_ccw_y = 0
+conteo_3_ccw_y = 0
+conteo_4_ccw_y = 0
+i_ccw_y = 0
+conteo_1_ccw_angle = 0
+conteo_2_ccw_angle = 0
+conteo_3_ccw_angle = 0
+conteo_4_ccw_angle = 0
+i_ccw_angle = 0
+
+conteo_1_acw_x = 0
+conteo_2_acw_x = 0
+conteo_3_acw_x = 0
+conteo_4_acw_x = 0
+i_acw_x = 0
+conteo_1_acw_y = 0
+conteo_2_acw_y = 0
+conteo_3_acw_y = 0
+conteo_4_acw_y = 0
+i_acw_y = 0
+conteo_1_acw_angle = 0
+conteo_2_acw_angle = 0
+conteo_3_acw_angle = 0
+conteo_4_acw_angle = 0
+i_acw_angle = 0
+
+# Puerto del Arduino 
+
+def RotDe():
+	global grade, i_grade
+	if (i_grade < 13):
+		i_grade +=1
+		if (i_grade < 14 and i_grade > -14):
+			grade = i_grade*paso
+			print("Grade: ", grade, "°, iteracion en angulo :", i_grade)
+			# Se mueve en dirección horaria
+			CCW(3)
+			# Se imprime la posición en la interfaz
+			PosAngle = "Rotación: " + str("{0:0.2f}".format(grade)) + "°"
+			textoAng.set(PosAngle)
+			lbl_posAng.config(textvariable=textoAng)
+			lbl_posAng.pack(anchor = "center")
+	else:
+		print("No puedes girar más la cámara o dañarás el equipo")
+
+def RotIz():
+	global grade, i_grade
+	if (i_grade > -13):
+		i_grade -=1
+		if (i_grade < 14 and i_grade > -14):
+			grade = i_grade*paso
+			print("Grade: ", grade, "°, iteracion en angulo :", i_grade)
+			# Se mueve en dirección antihoraria
+			ACW(3)
+			# Se imprime la posición en la interfaz
+			PosAngle = "Rotación: " + str("{0:0.2f}".format(grade)) + "°"
+			textoAng.set(PosAngle)
+			lbl_posAng.config(textvariable=textoAng)
+			lbl_posAng.pack(anchor = "center")
+	else:
+		print("No puedes girar más la cámara o dañarás el equipo")
 
 def SumaX():
 	global x
@@ -26,128 +97,250 @@ def SumaX():
 	x += 1
 	print("x: ", x)
 	# Se mueve en dirección horaria
-	CCW()
+	CCW(1)
+	# Se calcula la posición
+	xl = x*perimetro/200
+	coorX = 'X: ' + str("{0:0.2f}".format(xl)) + " mm"
+	textoX.set(coorX)
+	lbl_posX.config(textvariable=textoX)
+	lbl_posX.pack(anchor = "center")
 
 def RestaX():
 	global x
-	print("Se resta 1 en x")
-	x -= 1
-	print("x: ", x)
-	# Se mueve en dirección antihoraria
-	ACW()
+	if x < 1:
+		print("No se puede realizar esta acción, te encuentras al limite de X")
+	else:
+		print("Se resta 1 en x")
+		x -= 1
+		print("x: ", x)
+		# Se mueve en dirección antihoraria
+		ACW(1)
+		# Se calcula la posición
+		xl = x*perimetro/200
+		coorX = 'X: ' + str("{0:0.2f}".format(xl)) + " mm"
+		textoX.set(coorX)
+		lbl_posX.config(textvariable=textoX)
+		lbl_posX.pack(anchor = "center")
+
 
 def SumaY():
 	global y
 	print("Se suma 1 en y")
 	y += 1
 	print("y: ", y)
-
+	CCW(2)
+	# Se calcula la posición
+	yl = y*perimetro/200
+	coorY = 'Y: ' + str("{0:0.2f}".format(yl)) + " mm"
+	textoY.set(coorY)
+	lbl_posY.config(textvariable=textoY)
+	lbl_posY.pack(anchor = "center")
 
 def RestaY():
 	global y
-	print("Se resta 1 en y")
-	y -= 1
-	print("y: ", y)
+	if y < 1:
+		print("No se puede realizar esta acción, te encuentras al limite de Y")
+	else:
+		print("Se resta 1 en y")
+		y -= 1
+		print("y: ", y)
+		ACW(2)
+		# Se calcula la posición
+		yl = y*perimetro/200
+		coorY = 'Y: ' + str("{0:0.2f}".format(yl)) + " mm"
+		textoY.set(coorY)
+		lbl_posY.config(textvariable=textoY)
+		lbl_posY.pack(anchor = "center")
 
-def CCW():
-	conteo_1 = 0
-	conteo_2 = 0
-	conteo_3 = 0
-	conteo_4 = 0
-	i = 0
-	# while i < 200:
-	# 	i += 1
-	# 	if (i == conteo_1*4 + 1):
-	# 		# print("A1, veces que pasa por aqui: ", conteo_1)
-	# 		arduino.digital[IN1].write(0)
-	# 		arduino.digital[IN2].write(0)
-	# 		arduino.digital[IN3].write(0)
-	# 		arduino.digital[IN4].write(1)
-	# 		time.sleep(0.005)
-	# 		conteo_1 += 1
+def CCW(u):
+	global conteo_1_ccw_x, conteo_2_ccw_x, conteo_3_ccw_x, conteo_4_ccw_x, conteo_1_ccw_y, conteo_2_ccw_y, conteo_3_ccw_y, conteo_4_ccw_y, i_ccw_x, i_ccw_y
+	global i_ccw_angle, conteo_1_ccw_angle, conteo_2_ccw_angle, conteo_3_ccw_angle, conteo_4_ccw_angle
+	iteracion = 0
+	if u == 1:	
+		print("X")
+		i_ccw = i_ccw_x
+	elif u == 3:
+		print("Cámara")
+		i_ccw = i_ccw_angle
+	else:
+		print("Y")
+		i_ccw = i_ccw_y
 
-	# 	if(i == conteo_2*4 + 2):
-	# 		# print("A2, veces que pasa por aqui: ", conteo_2)
-	# 		arduino.digital[IN1].write(0)
-	# 		arduino.digital[IN2].write(1)
-	# 		arduino.digital[IN3].write(0)
-	# 		arduino.digital[IN4].write(0)
-	# 		time.sleep(0.005)
-	# 		conteo_2 += 1
+	while iteracion < 1:
+		iteracion += 1
+		i_ccw += 1
+		if ((i_ccw == conteo_1_ccw_x*4 + 1) or (i_ccw == conteo_1_ccw_y*4 + 1) or (i_ccw == conteo_1_ccw_angle*4 + 1)):
+			if u == 1:	
+				print("A1 X, veces que pasa por aqui: ", conteo_1_ccw_x)
+				conteo_1_ccw_x += 1
+				i_ccw_x = i_ccw
+			elif u == 3:	
+				print("A1 Cam, veces que pasa por aqui: ", conteo_1_ccw_angle)
+				conteo_1_ccw_angle += 1
+				i_ccw_angle = i_ccw
+			else:
+				print("A1 Y, veces que pasa por aqui: ", conteo_1_ccw_y)
+				conteo_1_ccw_y += 1
+				i_ccw_y = i_ccw
 
-	# 	if(i == conteo_3*4 + 3):
-	# 		# print("B1, veces que pasa por aqui: ", conteo_3)
-	# 		arduino.digital[IN1].write(0)
-	# 		arduino.digital[IN2].write(0)
-	# 		arduino.digital[IN3].write(1)
-	# 		arduino.digital[IN4].write(0)
-	# 		time.sleep(0.005)
-	# 		conteo_3 += 1
+		if ((i_ccw == conteo_2_ccw_x*4 + 2) or (i_ccw == conteo_2_ccw_y*4 + 2) or i_ccw == conteo_2_ccw_angle*4 + 2):
+			if u == 1:	
+				print("A2 X, veces que pasa por aqui: ", conteo_2_ccw_x)
+				conteo_2_ccw_x += 1
+				i_ccw_x = i_ccw
+			elif u == 3:	
+				print("A2 Cam, veces que pasa por aqui: ", conteo_2_ccw_angle)
+				conteo_2_ccw_angle += 1
+				i_ccw_angle = i_ccw
+			else:
+				print("A2 Y, veces que pasa por aqui: ", conteo_2_ccw_y)
+				conteo_2_ccw_y += 1
+				i_ccw_y = i_ccw
 
-	# 	if(i == conteo_4*4 + 4):
-	# 		# print("B2, veces que pasa por aqui: ", conteo_4)
-	# 		arduino.digital[IN1].write(1)
-	# 		arduino.digital[IN2].write(0)
-	# 		arduino.digital[IN3].write(0)
-	# 		arduino.digital[IN4].write(0)
-	# 		time.sleep(0.005)
-	# 		conteo_4 += 1
+		if ((i_ccw == conteo_3_ccw_x*4 + 3) or (i_ccw == conteo_3_ccw_y*4 + 3) or (i_ccw == conteo_3_ccw_angle*4 + 3)):
+			if u == 1:	
+				print("B1 X, veces que pasa por aqui: ", conteo_3_ccw_x)
+				conteo_3_ccw_x += 1
+				i_ccw_x = i_ccw
+			elif u == 3:	
+				print("B1 Cam, veces que pasa por aqui: ", conteo_3_ccw_angle)
+				conteo_3_ccw_angle += 1
+				i_ccw_angle = i_ccw
+			else:
+				print("B1 Y, veces que pasa por aqui: ", conteo_3_ccw_y)
+				conteo_3_ccw_y += 1
+				i_ccw_y = i_ccw
 
-	# # Se pone al final en ceros las salidas para evitar sobrecalentamiento
-	# arduino.digital[IN1].write(0)
-	# arduino.digital[IN2].write(0)
-	# arduino.digital[IN3].write(0)
-	# arduino.digital[IN4].write(0)
+		if ((i_ccw == conteo_4_ccw_x*4 + 4) or (i_ccw == conteo_4_ccw_y*4 + 4) or (i_ccw == conteo_4_ccw_angle*4 + 4)):
+			if u == 1:	
+				print("B2 X, veces que pasa por aqui: ", conteo_4_ccw_x)
+				conteo_4_ccw_x += 1
+				i_ccw_x = i_ccw
+			elif u == 3:	
+				print("B2 Cam, veces que pasa por aqui: ", conteo_4_ccw_angle)
+				conteo_4_ccw_angle += 1
+				i_ccw_angle = i_ccw
+			else:
+				print("B2 Y, veces que pasa por aqui: ", conteo_4_ccw_y)
+				conteo_4_ccw_y += 1
+				i_ccw_y = i_ccw
 
-def ACW():
-	conteo_1 = 0
-	conteo_2 = 0
-	conteo_3 = 0
-	conteo_4 = 0
-	i = 0
-	# while i < 200:
-	# 	i += 1
-	# 	if (i == conteo_1*4 + 1):
-	# 		# print("A1, veces que pasa por aqui: ", conteo_1)
-	# 		arduino.digital[IN1].write(1)
-	# 		arduino.digital[IN2].write(0)
-	# 		arduino.digital[IN3].write(0)
-	# 		arduino.digital[IN4].write(0)
-	# 		time.sleep(0.005)
-	# 		conteo_1 += 1
+	# Se pone al final en ceros las salidas para evitar sobrecalentamiento
+	if (i_ccw == 200):
+		if u == 1:	
+			i_ccw_x = 0;
+			conteo_1_ccw_x = 0
+			conteo_2_ccw_x = 0
+			conteo_3_ccw_x = 0
+			conteo_4_ccw_x = 0
+		elif u == 3:	
+			i_ccw_angle = 0;
+			conteo_1_ccw_angle = 0
+			conteo_2_ccw_angle = 0
+			conteo_3_ccw_angle = 0
+			conteo_4_ccw_angle = 0
+		else:
+			i_ccw_y = 0;
+			conteo_1_ccw_y = 0
+			conteo_2_ccw_y = 0
+			conteo_3_ccw_y = 0
+			conteo_4_ccw_y = 0
+	
 
-	# 	if(i == conteo_2*4 + 2):
-	# 		# print("A2, veces que pasa por aqui: ", conteo_2)
-	# 		arduino.digital[IN1].write(0)
-	# 		arduino.digital[IN2].write(0)
-	# 		arduino.digital[IN3].write(1)
-	# 		arduino.digital[IN4].write(0)
-	# 		time.sleep(0.005)
-	# 		conteo_2 += 1
 
-	# 	if(i == conteo_3*4 + 3):
-	# 		# print("B1, veces que pasa por aqui: ", conteo_3)
-	# 		arduino.digital[IN1].write(0)
-	# 		arduino.digital[IN2].write(1)
-	# 		arduino.digital[IN3].write(0)
-	# 		arduino.digital[IN4].write(0)
-	# 		time.sleep(0.005)
-	# 		conteo_3 += 1
+def ACW(u):
+	global conteo_1_acw_x, conteo_2_acw_x, conteo_3_acw_x, conteo_4_acw_x, conteo_1_acw_y, conteo_2_acw_y, conteo_3_acw_y, conteo_4_acw_y, i_acw_x, i_acw_y
+	global i_acw_angle, conteo_1_acw_angle, conteo_2_acw_angle, conteo_3_acw_angle, conteo_4_acw_angle
+	iteracion = 0
+	if u == 1:	
+		print("X")
+		i_acw = i_acw_x
+	elif u == 3:
+		print("Cámara")
+		i_acw = i_acw_angle
+	else:
+		print("Y")
+		i_acw = i_acw_y
 
-	# 	if(i == conteo_4*4 + 4):
-	# 		# print("B2, veces que pasa por aqui: ", conteo_4)
-	# 		arduino.digital[IN1].write(0)
-	# 		arduino.digital[IN2].write(0)
-	# 		arduino.digital[IN3].write(0)
-	# 		arduino.digital[IN4].write(1)
-	# 		time.sleep(0.005)
-	# 		conteo_4 += 1
+	while iteracion < 1:
+		iteracion += 1
+		i_acw += 1
+		if ((i_acw == conteo_1_acw_x*4 + 1) or (i_acw == conteo_1_acw_y*4 + 1) or (i_acw == conteo_1_acw_angle*4 + 1)):
+			if u == 1:	
+				print("A1 X, veces que pasa por aqui: ", conteo_1_acw_x)
+				conteo_1_acw_x += 1
+				i_acw_x = i_acw
+			elif u == 3:	
+				print("A1 Cam, veces que pasa por aqui: ", conteo_1_acw_angle)
+				conteo_1_acw_angle += 1
+				i_acw_angle = i_acw
+			else:
+				print("A1 Y, veces que pasa por aqui: ", conteo_1_acw_y)
+				conteo_1_acw_y += 1
+				i_acw_y = i_acw
 
-	# # Se pone al final en ceros las salidas para evitar sobrecalentamiento
-	# arduino.digital[IN1].write(0)
-	# arduino.digital[IN2].write(0)
-	# arduino.digital[IN3].write(0)
-	# arduino.digital[IN4].write(0)
+		if ((i_acw == conteo_2_acw_x*4 + 2) or (i_acw == conteo_2_acw_y*4 + 2) or (i_acw == conteo_2_acw_angle*4 + 2)):
+			if u == 1:	
+				print("A2 X, veces que pasa por aqui: ", conteo_2_acw_x)
+				conteo_2_acw_x += 1
+				i_acw_x = i_acw
+			elif u == 3:	
+				print("A2 Cam, veces que pasa por aqui: ", conteo_2_acw_angle)
+				conteo_2_acw_angle += 1
+				i_acw_angle = i_acw
+			else:
+				print("A2 Y, veces que pasa por aqui: ", conteo_2_acw_y)
+				conteo_2_acw_y += 1
+				i_acw_y = i_acw
+
+		if ((i_acw == conteo_3_acw_x*4 + 3) or (i_acw == conteo_3_acw_y*4 + 3) or (i_acw == conteo_3_acw_angle*4 + 3)):
+			if u == 1:	
+				print("B1 X, veces que pasa por aqui: ", conteo_3_acw_x)
+				conteo_3_acw_x += 1
+				i_acw_x = i_acw
+			elif u == 3:	
+				print("B1 Cam, veces que pasa por aqui: ", conteo_3_acw_angle)
+				conteo_3_acw_angle += 1
+				i_acw_angle = i_acw
+			else:
+				print("B1 Y, veces que pasa por aqui: ", conteo_3_acw_y)
+				conteo_3_acw_y += 1
+				i_acw_y = i_acw
+
+		if ((i_acw == conteo_4_acw_x*4 + 4) or (i_acw == conteo_4_acw_y*4 + 4) or (i_acw == conteo_4_acw_angle*4 + 4)):
+			if u == 1:	
+				print("B2 X, veces que pasa por aqui: ", conteo_4_acw_x)
+				conteo_4_acw_x += 1
+				i_acw_x = i_acw
+			elif u == 3:	
+				print("B2 Cam, veces que pasa por aqui: ", conteo_4_acw_angle)
+				conteo_4_acw_angle += 1
+				i_acw_angle = i_acw
+			else:
+				print("B2 Y, veces que pasa por aqui: ", conteo_4_acw_y)
+				conteo_4_acw_y += 1
+				i_acw_y = i_acw
+
+	# Se pone al final en ceros las salidas para evitar sobrecalentamiento
+	if (i_acw == 200):
+		if u == 1:	
+			i_acw_x = 0;
+			conteo_1_acw_x = 0
+			conteo_2_acw_x = 0
+			conteo_3_acw_x = 0
+			conteo_4_acw_x = 0
+		elif u == 3:	
+			i_acw_angle = 0;
+			conteo_1_acw_angle = 0
+			conteo_2_acw_angle = 0
+			conteo_3_acw_angle = 0
+			conteo_4_acw_angle = 0
+		else:
+			i_acw_y = 0;
+			conteo_1_acw_y = 0
+			conteo_2_acw_y = 0
+			conteo_3_acw_y = 0
+			conteo_4_acw_y = 0
 
 def TomaFoto():
 	print("Se toman las fotos")
@@ -206,8 +399,14 @@ def cerrar():
 		root.destroy()
 		root.quit()
 
+def EmergenciaLim():
+	MessageBox.showwarning("Cuidado", "Estas en el límite de carrera, si sigues el sistema podría dañarse")
+
+def EmergenciaTem():
+	MessageBox.showwarning("Cuidado", "La temperatura del sistema es demasiado alta, utilizarlo en estas condiciones puede ser perjudicial para su funcionamiento")
+
 def Manual():
-	global win_control, lbl_video
+	global win_control, lbl_video, lbl_posX, lbl_posY,lbl_posAng, textoX, textoY, textoAng
 	print("Se hacen visibles los controles y se cierra la ventana principal")
 	# Se cierra a ventana principal
 	root.withdraw()
@@ -224,6 +423,27 @@ def Manual():
 	label_win.pack(anchor = "center")
 	label_win.config(bg = "lightblue", font = ("Century Gothic",18))
 
+
+	# Se pone texto arriba de los controles
+	lbl_posX = Label(win_control, bg = "lightblue")
+	lbl_posY = Label(win_control, bg = "lightblue") 
+	lbl_posAng = Label(win_control, bg = "lightblue") 
+
+	textoX = StringVar()
+	textoX.set("X: 0.00 mm")
+	lbl_posX.config(textvariable=textoX)
+	lbl_posX.pack(anchor = "center")
+
+	textoY = StringVar()
+	textoY.set("Y: 0.00 mm")
+	lbl_posY.config(textvariable=textoY)
+	lbl_posY.pack(anchor = "center")
+
+	textoAng = StringVar()
+	textoAng.set("Rotación: 0.00°")
+	lbl_posAng.config(textvariable=textoAng)
+	lbl_posAng.pack(anchor = "center")
+
 	# Se van a agregar frames
 	Con_Control = Frame(win_control)
 	Con_Control.pack(side = RIGHT, padx = 30) # Por defecto no tiene tamaño
@@ -232,6 +452,17 @@ def Manual():
 	Con_Control.config(bg = "lightgray")
 	Con_Control.config(bd = 12)
 	Con_Control.config(relief="ridge")
+	
+	# Se crea un frame para controles de camara
+	Con_Cam = Frame(Con_Control)
+	Con_Cam.pack(side = TOP, pady = 3) # Por defecto no tiene tamaño
+	# win_control.config(width=800,heigh=500) # Se define la dimensión
+	Con_Cam.config(cursor="arrow") # Se define un cursor
+	Con_Cam.config(bg = "lightgray")
+
+	# Botones para girar la cámara
+	Button(Con_Cam,text="Rotar derecha", font = ("Century Gothic",12), command = RotDe).pack(side = RIGHT, pady = 3, padx = 6)
+	Button(Con_Cam,text="Rotar izquierda", font = ("Century Gothic",12), command = RotIz).pack(side = LEFT, pady = 3)
 
 	# Botones para subir y bajar
 	Button(Con_Control,text="Arriba", font = ("Century Gothic",12), command = SumaY).pack(side = TOP, pady = 1)
@@ -271,6 +502,7 @@ root = Tk()
 cap = None
 x = 0
 y = 0
+grade = 0
 
 root.title("NDVI interface") # Se cambia el nombre de la app
 # root.resizable(0,0) # Asi ya no es redimensionable
@@ -287,6 +519,7 @@ frame.config(cursor="arrow") # Se define un cursor
 frame.config(bg = "lightblue")
 frame.config(bd = 12)
 frame.config(relief="ridge")
+
 
 label = Label(frame, text="- Bienvenida/o -")
 label.pack(anchor = "center")
